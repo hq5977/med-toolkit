@@ -13,4 +13,21 @@ import lombok.experimental.Accessors;
 @Accessors
 @Data
 public class PatientLiverDataAnalysisResultVo {
+
+    /**
+     * 获取Child-Pugh评分 结果描述
+     */
+    private String childResultDesc;
+
+
+    /**
+     * Child-Pugh评分 的分级
+     */
+    private String childResultLevel;
+
+
+    /**
+     * MELD评分
+     */
+    private int MELDScore;
 }

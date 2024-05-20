@@ -1,24 +1,46 @@
 package com.joey.core.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.joey.core.dto.PatientLiverDataDTO;
 
 /**
  *  Child-Pugh 计算工具类
+ *  参考：https://cals.medlive.cn/calc/show/2?id=calc-20
  * @Author huangqiang
  * @Date 2024/5/17
  */
 public class ChildCalculatorUtil {
 
     /**
-     * 能够控制的腹水
+     * 没有腹水
      */
-    private static String[] SMALL_ASCITIES= new String[]{"",""};
+    private static String[] NO_ASCITIES= new String[]{"无"};
 
     /**
      * 能够控制的腹水
      */
-    private static String[] large_ASCITIES= new String[]{"",""};
+    private static String[] SMALL_ASCITIES= new String[]{"有（少量）","少量","中量","少-中","有 中量","有 （少量）"};
+
+    /**
+     * 难以控制的腹水
+     */
+    private static String[] LARGE_ASCITIES= new String[]{"有（大量）","大量","有（超声：中-大量）"};
+
+    /**
+     * 无脑病
+     */
+    private static String[] NO_HE= new String[]{"无"};
+
+    /**
+     * 能够控制的脑病(I~II)
+     */
+    private static String[] SMALL_HE= new String[]{"有（I期）","I期","有（未分级）","2期","1期","0期"};
+
+    /**
+     * 难以控制的脑病(III~IV)
+     */
+    private static String[] LARGE_HE= new String[]{"3期","4期"};
 
     /**
      * 计算 Child-Pugh评分
@@ -27,11 +49,11 @@ public class ChildCalculatorUtil {
      */
     public static int calculate(PatientLiverDataDTO dataDTO) {
         // 总胆红素
-        Float totalBilirubin = dataDTO.getTotalBilirubin();
+        Double totalBilirubin = dataDTO.getTotalBilirubin();
         // 总胆红素
-        Float albumin = dataDTO.getAlbumin();
+        Double albumin = dataDTO.getAlbumin();
         // 国际标准化比率(INR)
-        Float inr = dataDTO.getInr();
+        Double inr = dataDTO.getInr();
         // 腹水(有无腹水)
         String ascites = dataDTO.getAscites();
         // 肝性脑病(有无HE)
@@ -47,21 +69,44 @@ public class ChildCalculatorUtil {
         int inrScore = getInrScore(inr);
         // 腹水分
         int ascitesScore = getAscitesScore(ascites);
+        if (ascitesScore == -1){
+            System.err.println("腹水未找到结果："+ JSONUtil.toJsonStr(dataDTO));
+            return -1;
+        }
         // 肝性脑病分
-        int HEScore = getHEScore(totalBilirubin);
+        int HEScore = getHEScore(hepaticEncephalopathy);
+        if (HEScore == -1){
+            System.err.println("肝性脑病分未找到结果："+ JSONUtil.toJsonStr(dataDTO));
+            return -1;
+        }
 
         int total = totalBilirubinScore+ albuminScore+ inrScore+ ascitesScore+ HEScore;
 
-        return 0;
+        return total;
     }
 
     /**
      * 肝性脑病分
-     * @param totalBilirubin
+     * @param hepaticEncephalopathy
      * @return
      */
-    private static int getHEScore(Float totalBilirubin) {
-        return 0;
+    private static int getHEScore(String hepaticEncephalopathy) {
+        if (StrUtil.isEmpty(hepaticEncephalopathy)){
+            return -1;
+        }
+        if (StrUtil.equalsAny(hepaticEncephalopathy,NO_HE)){
+            // 无脑病
+            return 1;
+        }
+        if (StrUtil.equalsAny(hepaticEncephalopathy,SMALL_HE)){
+            // 能够控制的脑病(I~II)
+            return 2;
+        }
+        if (StrUtil.equalsAny(hepaticEncephalopathy,LARGE_HE)){
+            // 难以控制的脑病(III~IV)
+            return 3;
+        }
+        return -1;
     }
 
     /**
@@ -73,9 +118,19 @@ public class ChildCalculatorUtil {
         if (StrUtil.isEmpty(ascites)){
             return -1;
         }
-        String[] s1 = new String[]{"",""};
-        StrUtil.equalsAny("1",s1);
-        return 0;
+        if (StrUtil.equalsAny(ascites,NO_ASCITIES)){
+            // 无腹水
+            return 1;
+        }
+        if (StrUtil.equalsAny(ascites,SMALL_ASCITIES)){
+            // 能够控制的腹水
+            return 2;
+        }
+        if (StrUtil.equalsAny(ascites,LARGE_ASCITIES)){
+            // 难以控制的腹水
+            return 3;
+        }
+        return -1;
     }
 
     /**
@@ -83,16 +138,16 @@ public class ChildCalculatorUtil {
      * @param inr
      * @return
      */
-    private static int getInrScore(Float inr) {
+    private static int getInrScore(Double inr) {
         if (null == inr){
             return -1;
         }
-        Float onePointSeven = new Float(1.7);
-        Float twoPointTwo = new Float(2.2);
+        Double onePointSeven = new Double(1.7);
+        Double twoPointTwo = new Double(2.2);
         // 与1.7比较
-        int compareOnePointSeven = Float.compare(inr, onePointSeven);
+        int compareOnePointSeven = Double.compare(inr, onePointSeven);
         // 与2.2比较
-        int compareTwoPointTwo = Float.compare(inr, twoPointTwo);
+        int compareTwoPointTwo = Double.compare(inr, twoPointTwo);
         if (compareOnePointSeven< 0){
             // <1.7
             return 1;
@@ -111,24 +166,24 @@ public class ChildCalculatorUtil {
      * @param albumin
      * @return
      */
-    private static int getAlbuminScore(Float albumin) {
+    private static int getAlbuminScore(Double albumin) {
         if (null == albumin){
             return -1;
         }
-        Float threePointFive = new Float(3.5);
-        Float twoPointEight = new Float(2.8);
-        // 与3.5比较
-        int compareThreePointFive = Float.compare(albumin, threePointFive);
-        //与2.8比较
-        int compareTwoPointEight = Float.compare(albumin, twoPointEight);
-        if (compareThreePointFive > 0){
-            // >3.5
+        Double thirtyFive = new Double(35);
+        Double twentyEight = new Double(28);
+        // 与35比较
+        int compareThirtyFive = Double.compare(albumin, thirtyFive);
+        //与28比较
+        int compareTwentyEight = Double.compare(albumin, twentyEight);
+        if (compareThirtyFive > 0){
+            // >35
             return 1;
-        } else if (compareTwoPointEight>=0 && compareThreePointFive<=0) {
-            // 2.8~3.5
+        } else if (compareTwentyEight>=0 && compareThirtyFive<=0) {
+            // 28~35
             return 2;
-        } else if (compareTwoPointEight <0) {
-            // < 2.8
+        } else if (compareTwentyEight <0) {
+            // < 28
             return 3;
         }
         return -1;
@@ -139,22 +194,22 @@ public class ChildCalculatorUtil {
      * @param totalBilirubin
      * @return
      */
-    private static int getTotalBilirubinScore(Float totalBilirubin) {
+    private static int getTotalBilirubinScore(Double totalBilirubin) {
         if (null == totalBilirubin){
             return -1;
         }
-        Float two = new Float(2);
-        Float three = new Float(3);
-        int compareTwo = Float.compare(totalBilirubin, two);
-        int compareThree = Float.compare(totalBilirubin, three);
-        if (compareTwo< 0){
-            // <2
+        Double thirtyFour = new Double(34);
+        Double fifty = new Double(50);
+        int compareThirtyFour = Double.compare(totalBilirubin, thirtyFour);
+        int compareFifty = Double.compare(totalBilirubin, fifty);
+        if (compareThirtyFour< 0){
+            // <34
             return 1;
-        } else if (compareTwo>=0 && compareThree<=0) {
-            // 2~3
+        } else if (compareThirtyFour>=0 && compareFifty<=0) {
+            // 34~50
             return 2;
-        } else if (compareThree>0) {
-            // >3
+        } else if (compareFifty>0) {
+            // >50
             return 3;
         }
         return -1;

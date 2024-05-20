@@ -15,19 +15,24 @@ import lombok.experimental.Accessors;
 public class PatientLiverDataDTO {
 
     /**
-     * 总胆红素/血清肌酐
+     * 编号
      */
-    private Float totalBilirubin;
+    private Double no;
 
     /**
-     * c
+     * 总胆红素/血清胆红素
      */
-    private Float albumin;
+    private Double totalBilirubin;
+
+    /**
+     * 白蛋白
+     */
+    private Double albumin;
 
     /**
      * 国际标准化比率(INR)
      */
-    private Float inr;
+    private Double inr;
 
     /**
      * 腹水(有无腹水)
@@ -40,12 +45,23 @@ public class PatientLiverDataDTO {
     private String hepaticEncephalopathy;
 
     /**
-     * 血清胆红素（Cr
+     * 血清肌酐（Cr
      */
-    private Float serumBilirubin;
+    private Double serumBilirubin;
 
     /**
      * 血钠（na）
      */
-    private Float na;
+    private Double na;
+
+
+    /**
+     * child分
+     */
+    private String child;
+
+    /**
+     * MELD分
+     */
+    private Double meld;
 }

@@ -15,6 +15,11 @@ import lombok.experimental.Accessors;
 public class ColumnIndexDTO {
 
     /**
+     * 编号
+     */
+    private Integer no;
+
+    /**
      * 总胆红素/血清肌酐
      */
     private Integer totalBilirubin;
@@ -48,4 +53,14 @@ public class ColumnIndexDTO {
      * 血钠（na）
      */
     private Integer na;
+
+    /**
+     * child分
+     */
+    private Integer child;
+
+    /**
+     * MELD分
+     */
+    private Integer meld;
 }

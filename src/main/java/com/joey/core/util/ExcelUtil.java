@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -38,26 +39,27 @@ public class ExcelUtil {
         if (StringUtils.isNotBlank(filePathStr)) {
             Path filePath = Paths.get(filePathStr);
             try (InputStream inputStream = Files.newInputStream(filePath);
-                 Workbook workbook = new XSSFWorkbook(inputStream);
-                 FileOutputStream outputStream = new FileOutputStream(filePathStr)) {
+                 Workbook workbook = new XSSFWorkbook(inputStream)) {
                 // 获取第一个工作表
                 Sheet sheet = workbook.getSheetAt(0);
                 Set<String> ascites = new HashSet<>();
                 Set<String> HE = new HashSet<>();
                 sheet.forEach(row -> {
-                    String ascitesValue = getCellValue(row, 22, String.class);
-                    if (StrUtil.isNotEmpty(ascitesValue)){
-                        ascites.add(ascitesValue);
+                    int rowNum = row.getRowNum();
+                    if (0 != rowNum){
+                        String ascitesValue = getCellValue(row, 21, String.class);
+                        if (StrUtil.isNotEmpty(ascitesValue)){
+                            ascites.add(ascitesValue);
+                        }
+                        String HEValue = getCellValue(row, 22, String.class);
+                        if (StrUtil.isNotEmpty(HEValue)){
+                            HE.add(HEValue);
+                        }
                     }
-                    String HEValue = getCellValue(row, 23, String.class);
-                    if (StrUtil.isNotEmpty(HEValue)){
-                        HE.add(HEValue);
-                    }
-
                 });
-                System.out.println("ascites:"+ascites);
-                System.out.println("HE:"+HE);
-                workbook.write(outputStream);
+                System.out.println("ascites:" +ascites);
+                System.out.println("HE:" +HE);
+                //workbook.write(outputStream);
             } catch (IOException e) {
                 System.err.println(e);
             }
@@ -65,7 +67,7 @@ public class ExcelUtil {
     }
 
     public static void main(String[] args) {
-        String filePath = "/Users/huangqiang/data/data1.xlsx";
+        String filePath = "/Users/huangqiang/data/data4.xlsx";
         dataConvert(filePath);
     }
 
@@ -102,13 +104,15 @@ public class ExcelUtil {
         switch (cellType) {
             case STRING:
                 String stringValue = cell.getStringCellValue();
-                if (StrUtil.isEmpty(stringValue)) {
-                    result = (T) stringValue;
+                if (StrUtil.isNotEmpty(stringValue)) {
+                    result = (T) StrUtil.trim(stringValue);
                 }
                 break;
             case NUMERIC:
                 Double numericCellValue = cell.getNumericCellValue();
-                result = (T) numericCellValue;
+                if (null!= numericCellValue){
+                    result = (T) numericCellValue;
+                }
                 break;
             default:
                 break;

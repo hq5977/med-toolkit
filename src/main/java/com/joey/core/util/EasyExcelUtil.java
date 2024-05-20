@@ -71,13 +71,14 @@ public class EasyExcelUtil {
     private static PatientLiverDataDTO getRowData(Row row, ColumnIndexDTO columnIndexDTO) {
 
         PatientLiverDataDTO patientLiverDataDTO= PatientLiverDataDTO.builder()
-                .totalBilirubin(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Float.class))
-                .albumin(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Float.class))
-                .inr(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Float.class))
-                .ascites(getCellValue(row,columnIndexDTO.getTotalBilirubin(),String.class))
-                .hepaticEncephalopathy(getCellValue(row,columnIndexDTO.getTotalBilirubin(),String.class))
-                .serumBilirubin(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Float.class))
-                .na(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Float.class))
+                .no(getCellValue(row,columnIndexDTO.getNo(),Double.class))
+                .totalBilirubin(getCellValue(row,columnIndexDTO.getTotalBilirubin(),Double.class))
+                .albumin(getCellValue(row,columnIndexDTO.getAlbumin(),Double.class))
+                .inr(getCellValue(row,columnIndexDTO.getInr(),Double.class))
+                .ascites(getCellValue(row,columnIndexDTO.getAscites(),String.class))
+                .hepaticEncephalopathy(getCellValue(row,columnIndexDTO.getHepaticEncephalopathy(),String.class))
+                .serumBilirubin(getCellValue(row,columnIndexDTO.getSerumBilirubin(),Double.class))
+                .na(getCellValue(row,columnIndexDTO.getNa(),Double.class))
                 .build();
 
         return patientLiverDataDTO;
@@ -114,7 +115,7 @@ public class EasyExcelUtil {
             case STRING:
                 String stringValue = cell.getStringCellValue();
                 if (StrUtil.isEmpty(stringValue)) {
-                    result = (T) stringValue;
+                    result = (T) StrUtil.trim(stringValue);
                 }
                 break;
             case NUMERIC:
@@ -129,6 +130,9 @@ public class EasyExcelUtil {
 
     public static void main(String[] args) {
         String filePath = "/Users/huangqiang/data/myTest.xlsx";
+        ColumnIndexDTO columnIndexDTO = ColumnIndexDTO.builder()
+
+                .build();
         dataConvert(filePath,null);
     }
 }
