@@ -1,7 +1,6 @@
 package com.joey.core.util;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.joey.core.dto.ColumnIndexDTO;
 import com.joey.core.dto.PatientLiverDataDTO;
 import com.joey.core.vo.PatientLiverDataAnalysisResultVo;
@@ -21,7 +20,7 @@ import java.io.IOException;
  * @Author huangqiang
  * @Date 2024/5/16
  */
-public class EasyExcelModifyUtil {
+public class ExcelModifyUtil {
 
     /**
      * 斜杠符号.
@@ -47,37 +46,30 @@ public class EasyExcelModifyUtil {
                         PatientLiverDataDTO patientLiverDataDTO  = getRowData(row,columnIndexDTO);
                         // 获取计算结果
                         PatientLiverDataAnalysisResultVo resultVo = MedCalculatorUtil.calculate(patientLiverDataDTO);
-                        System.out.println("rowNum:"+rowNum+";入参:"+ JSONUtil.toJsonStr(patientLiverDataDTO)+"；出参："+ JSONUtil.toJsonStr(resultVo));
                         if (StrUtil.isNotEmpty(resultVo.getChildResultDesc())){
                             // 获取单元格
-                            Cell cell = row.getCell(44);
-                            if (cell == null) {
-                                // 如果没有单元格，则创建它
-                                cell = row.createCell(44);
-                            }
+                            Cell cell = getCell(row, 44);
                             // 设置单元格的新内容
                             cell.setCellValue(resultVo.getChildResultDesc());
                         }
                         if (StrUtil.isNotEmpty(resultVo.getChildResultLevel())){
                             // 获取单元格
-                            Cell cell = row.getCell(45);
-                            if (cell == null) {
-                                // 如果没有单元格，则创建它
-                                cell = row.createCell(45);
-                            }
+                            Cell cell = getCell(row, 45);
                             // 设置单元格的新内容
                             cell.setCellValue(resultVo.getChildResultLevel());
                         }
                         if (-1 != resultVo.getMELDScore()){
                             // 获取单元格
-                            Cell cell = row.getCell(46);
-                            if (cell == null) {
-                                // 如果没有单元格，则创建它
-                                cell = row.createCell(46);
-                            }
+                            Cell cell = getCell(row, 46);
                             // 设置单元格的新内容
                             cell.setCellValue(resultVo.getMELDScore());
                             // 设置单元格的新内容
+                        }
+                        if (StrUtil.isNotEmpty(resultVo.getMeldResultDesc())){
+                            // 获取单元格
+                            Cell cell = getCell(row, 47);
+                            // 设置单元格的新内容
+                            cell.setCellValue(resultVo.getMeldResultDesc());
                         }
                     }
                 });
@@ -93,6 +85,22 @@ public class EasyExcelModifyUtil {
                 System.err.println(e);
             }
         }
+    }
+
+    /**
+     * 获取cell
+     * @param row
+     * @param columnIndex
+     * @return
+     */
+    private static Cell getCell(Row row, int columnIndex) {
+        // 获取单元格
+        Cell cell = row.getCell(columnIndex);
+        if (cell == null) {
+            // 如果没有单元格，则创建它
+            cell = row.createCell(columnIndex);
+        }
+        return cell;
     }
 
     /**
@@ -113,7 +121,7 @@ public class EasyExcelModifyUtil {
                 .serumBilirubin(getCellValue(row,columnIndexDTO.getSerumBilirubin(),Double.class))
                 .na(getCellValue(row,columnIndexDTO.getNa(),Double.class))
                 .child(getCellValue(row,columnIndexDTO.getChild(),String.class))
-                .meld(getCellValue(row,columnIndexDTO.getMeld(),Double.class))
+                //.meld(getCellValue(row,columnIndexDTO.getMeld(),Double.class))
                 .build();
 
         return patientLiverDataDTO;
@@ -167,7 +175,7 @@ public class EasyExcelModifyUtil {
     }
 
     public static void main(String[] args) {
-        String filePath = "/Users/huangqiang/data/data7.xlsx";
+        String filePath = "/Users/huangqiang/data/data9.xlsx";
         ColumnIndexDTO columnIndexDTO = ColumnIndexDTO.builder()
                 .no(0)
                 .totalBilirubin(34)

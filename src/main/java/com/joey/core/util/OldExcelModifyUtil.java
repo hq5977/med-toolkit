@@ -21,7 +21,7 @@ import java.io.IOException;
  * @Author huangqiang
  * @Date 2024/5/16
  */
-public class NewEasyExcelModifyUtil {
+public class OldExcelModifyUtil {
 
     /**
      * 斜杠符号.
@@ -113,7 +113,7 @@ public class NewEasyExcelModifyUtil {
                 .serumBilirubin(getCellValue(row,columnIndexDTO.getSerumBilirubin(),Double.class))
                 .na(getCellValue(row,columnIndexDTO.getNa(),Double.class))
                 .child(getCellValue(row,columnIndexDTO.getChild(),String.class))
-                //.meld(getCellValue(row,columnIndexDTO.getMeld(),Double.class))
+                .meld(getCellValue(row,columnIndexDTO.getMeld(),Double.class))
                 .build();
 
         return patientLiverDataDTO;
@@ -167,7 +167,7 @@ public class NewEasyExcelModifyUtil {
     }
 
     public static void main(String[] args) {
-        String filePath = "/Users/huangqiang/data/data9.xlsx";
+        String filePath = "/Users/huangqiang/data/data7.xlsx";
         ColumnIndexDTO columnIndexDTO = ColumnIndexDTO.builder()
                 .no(0)
                 .totalBilirubin(34)

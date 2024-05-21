@@ -25,7 +25,7 @@ public class ChildCalculatorUtil {
     /**
      * 难以控制的腹水
      */
-    private static String[] LARGE_ASCITIES= new String[]{"有（大量）","大量","有（超声：中-大量）"};
+    private static String[] LARGE_ASCITIES= new String[]{"有（大量）","大量","有（超声：中-大量）","顽固性腹水","中-大量"};
 
     /**
      * 无脑病
@@ -35,7 +35,7 @@ public class ChildCalculatorUtil {
     /**
      * 能够控制的脑病(I~II)
      */
-    private static String[] SMALL_HE= new String[]{"有（I期）","I期","有（未分级）","2期","1期","0期"};
+    private static String[] SMALL_HE= new String[]{"有（I期）","I期","有（未分级）","2期","1期","0期","前驱期"};
 
     /**
      * 难以控制的脑病(III~IV)

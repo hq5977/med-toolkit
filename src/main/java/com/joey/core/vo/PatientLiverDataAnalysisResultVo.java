@@ -30,4 +30,9 @@ public class PatientLiverDataAnalysisResultVo {
      * MELD评分
      */
     private int MELDScore;
+
+    /**
+     * MELD评分结果描述
+     */
+    private String meldResultDesc;
 }

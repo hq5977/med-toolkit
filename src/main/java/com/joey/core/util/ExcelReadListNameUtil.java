@@ -9,26 +9,20 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
+ * 读取【有无腹水】和 【有无HE】的值列表
  * @Author huangqiang
  * @Date 2024/5/16
  */
-public class ExcelUtil {
-
-    /**
-     * 斜杠符号.
-     */
-    private static final String SLASH = "/";
+public class ExcelReadListNameUtil {
 
     /**
      * 数据转换.
@@ -49,11 +43,13 @@ public class ExcelUtil {
                     if (0 != rowNum){
                         String ascitesValue = getCellValue(row, 21, String.class);
                         if (StrUtil.isNotEmpty(ascitesValue)){
-                            ascites.add(ascitesValue);
+                            // 有无HE
+                            HE.add(ascitesValue);
                         }
                         String HEValue = getCellValue(row, 22, String.class);
                         if (StrUtil.isNotEmpty(HEValue)){
-                            HE.add(HEValue);
+                            // 有无腹水
+                            ascites.add(HEValue);
                         }
                     }
                 });
@@ -67,7 +63,7 @@ public class ExcelUtil {
     }
 
     public static void main(String[] args) {
-        String filePath = "/Users/huangqiang/data/data4.xlsx";
+        String filePath = "/Users/huangqiang/data/data9.xlsx";
         dataConvert(filePath);
     }
 

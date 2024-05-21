@@ -35,14 +35,9 @@ public class MELDCalculatorUtil {
             return -1;
         }
         // 国际单位计算
-        //int a = internationalCalculate(totalBilirubin,serumBilirubin,inr,na);
         // 单位转换
         totalBilirubin = totalBilirubin / 17.1;
         serumBilirubin = serumBilirubin / 88.4;
-
-        totalBilirubin = format(totalBilirubin);
-
-        serumBilirubin =format(serumBilirubin);
 
         if (totalBilirubin <1){
             totalBilirubin =new Double(1);
@@ -79,10 +74,6 @@ public class MELDCalculatorUtil {
         double totalBilirubinLn = Math.log(totalBilirubin);
         double serumBilirubinLn = Math.log(serumBilirubin);
         double inrLn = Math.log(inr);
-        totalBilirubinLn = format(totalBilirubinLn);
-        serumBilirubinLn = format(serumBilirubinLn);
-        inrLn = format(inrLn);
-        //double result = 10* (0.957* serumBilirubinLn + 0.378* totalBilirubinLn+ 1.12* inrLn + 0.643);
 
         //终末期肝病模型（MELD）评分的计算公式为：MELD=3.78×ln [T-BiL(mg/dl)]+11.2×ln[INR]+9.57×ln[Cr (mg/dl)] + 6.43。
         //公式中的T-BiL为总胆红素，INR为国际标准化比值，Cr为血清肌酐，ln即loge为自然对数。
@@ -92,63 +83,30 @@ public class MELDCalculatorUtil {
         // 总胆红素的换算系数为17.1，血清肌酐的换算系数为88.4。因此，在使用国际单位制时，MELD的计算公式为：
         // MELD=3.78×ln[T-BiL(μmol/L)÷17.1]+11.2×ln[INR]+9.57×ln[Cr (μmol/L)÷88.4] + 6.43。
         double result = 3.78* totalBilirubinLn + 11.2* inrLn+ 9.57* serumBilirubinLn  + 6.43;
+        if (result < 6){
+            result = 6;
+        }
         result = format(result);
-        boolean flag = false;
         if (result > 11){
             double temp = result;
             result = temp + 1.32* (137-na) - (0.033 * temp* (137-na));
-            //result = temp -na  - (0.025 * temp* (140-na)) +140;
-            result = format(result);
-            System.out.println("执行附加MELD评分，编号:"+ JSONUtil.toJsonStr(dataDTO)+ "原来分："+temp+"，新的分："+result);
-            flag =true;
         }
         int score = (int) Math.round(result);
-        if (null != dataDTO.getMeld()){
-            int oldScore = (int) Math.round(dataDTO.getMeld());
-            if (score != oldScore){
-                System.err.println("与原结果不一致:"+ JSONUtil.toJsonStr(dataDTO)+"；新结果："+score+"是否执行附加计算："+flag);
-            }
-        }
+//        if (null != dataDTO.getMeld()){
+//            int oldScore = (int) Math.round(dataDTO.getMeld());
+//            if (score != oldScore){
+//                System.err.println("Child与原结果不一致:"+ JSONUtil.toJsonStr(dataDTO)+"；新结果："+score);
+//            }
+//        }
         return score;
     }
 
     /**
-     * 国际单位计算
-     * @param totalBilirubin
-     * @param serumBilirubin
-     * @param inr
-     * @param na
-     * @return
-     */
-    private static int internationalCalculate(Double totalBilirubin, Double serumBilirubin, Double inr, Double na) {
-        totalBilirubin = totalBilirubin / 17.1;
-        serumBilirubin = serumBilirubin / 88.4;
-
-        double totalBilirubinLn = Math.log(totalBilirubin);
-        double serumBilirubinLn = Math.log(serumBilirubin);
-        double inrLn = Math.log(inr);
-        //double result = 10* (0.957* serumBilirubinLn + 0.378* totalBilirubinLn+ 1.12* inrLn + 0.643);
-
-        //终末期肝病模型（MELD）评分的计算公式为：MELD=3.78×ln [T-BiL(mg/dl)]+11.2×ln[INR]+9.57×ln[Cr (mg/dl)] + 6.43。
-        //公式中的T-BiL为总胆红素，INR为国际标准化比值，Cr为血清肌酐，ln即loge为自然对数。
-        // 需要注意的是，在欧美国家，公式中总胆红素和血清肌酐的单位用的是“mg/dl”。
-        // 而我国使用的是国际单位制(SI)，总胆红素和血清肌酐的单位是“μmol/L”。
-        // 在使用该公式计算MELD分数时，需要先把总胆红素和血清肌酐“μmol/L”换算为“mg/dl”。
-        // 总胆红素的换算系数为17.1，血清肌酐的换算系数为88.4。因此，在使用国际单位制时，MELD的计算公式为：
-        // MELD=3.78×ln[T-BiL(μmol/L)÷17.1]+11.2×ln[INR]+9.57×ln[Cr (μmol/L)÷88.4] + 6.43。
-        double result = 3.78* totalBilirubinLn + 11.2* inrLn+ 9.57* serumBilirubinLn  + 6.43;
-        int score = (int) result;
-
-        return score;
-    }
-
-    /**
-     * 四舍五入保留两位小数
+     * 返回四舍五入的整数
      * @param number
      * @return
      */
     private static double format(double number){
-        double result = Math.round(number * 100.0) / 100.0;
-        return result;
+        return  Math.round(number);
     }
 }
